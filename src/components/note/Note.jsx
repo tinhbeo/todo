@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-
+import "./style.css";
 const Note = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const { note, handleDeleteNote, handleOpenDetails } = props;
@@ -8,7 +8,7 @@ const Note = (props) => {
     <div>
       <div>
         <h1>{note.title}</h1>
-        <div>
+        <div className="group">
           <p>{note.time}</p>
           <div>
             <span onClick={() => setIsOpen(!isOpen)}>

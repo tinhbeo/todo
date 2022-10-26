@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import Note from "./components/note/Note";
 import { addNote, deleteNote } from "./features/note/noteSlice";
+import "./App.css";
 function App() {
   const data = useSelector((state) => state.noteReducer.data);
   const [value, setValue] = useState({
@@ -12,7 +13,6 @@ function App() {
   });
 
   const dispatch = useDispatch();
-  useEffect(() => console.log({ data }));
 
   const handleChangeTitle = (e) => {
     setValue({

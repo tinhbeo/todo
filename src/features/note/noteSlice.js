@@ -21,7 +21,6 @@ export const noteSlice = createSlice({
     },
     deleteNote: (state, value) => {
       const newData = state.data.filter((note) => note.id !== value.payload);
-      console.log(newData);
       return {
         data: state.data.filter((note) => note.id !== value.payload),
       };

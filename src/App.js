@@ -1,140 +1,75 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Todo from "./components/todo/Todo";
-import {
-  fetchTodoList,
-  addTodoItemAsync,
-  editTodoItemAsync,
-  deleteTodoItemAsync,
-} from "./features/todo/todoSlice";
+import { v4 as uuidv4 } from "uuid";
 
+import Note from "./components/note/Note";
+import { addNote, deleteNote } from "./features/note/noteSlice";
 function App() {
-  // const [data, setData] = useState([]);
-  const [value, setValue] = useState("");
-  const [idEdit, setId] = useState(null);
+  const data = useSelector((state) => state.noteReducer.data);
+  const [value, setValue] = useState({
+    title: "",
+    details: "",
+  });
+
   const dispatch = useDispatch();
-  const myInput = useRef(null);
-  const data = useSelector((state) => state.todoReducer.data);
-  useEffect(() => {
-    const getTodos = async () => {
-      // const respone = await fetch(
-      //   "https://6357f342c27556d28932afce.mockapi.io/api/v1/todos"
-      // );
-      // const todos = await respone.json();
-      const todos = dispatch(fetchTodoList());
-      // console.log({ todos });
-      // const newData = todos.map((todo) => ({
-      //   name: todo.name,
-      //   id: todo.id,
-      // }));
-      // setData([...newData]);
-      console.log({ data });
-    };
+  useEffect(() => console.log({ data }));
 
-    getTodos();
-  }, []);
-
-  const handleChangeValue = (e) => {
-    setValue(e.target.value);
+  const handleChangeTitle = (e) => {
+    setValue({
+      ...value,
+      title: e.target.value,
+    });
   };
 
-  const handleAddTodo = async () => {
-    // const res = await fetch(
-    //   `https://6357f342c27556d28932afce.mockapi.io/api/v1/todos`,
-    //   {
-    //     method: "POST",
-    //     mode: "cors",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ name: value }),
-    //   }
-    // );
-    // const todo = await res.json();
-    // console.log(todo);
-    // setData([...data, todo]);
-    // setValue("");
-    dispatch(addTodoItemAsync(value));
-    setValue("");
+  const handleChangeDetails = (e) => {
+    setValue({
+      ...value,
+      details: e.target.value,
+    });
   };
 
-  const handleEditTodo = async () => {
-    if (idEdit === null) {
-      return;
-    }
-    // const res = await fetch(
-    //   `https://6357f342c27556d28932afce.mockapi.io/api/v1/todos/${idEdit}`,
-    //   {
-    //     method: "PUT",
-    //     mode: "cors",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ name: value }),
-    //   }
-    // );
-    // const todo = await res.json();
-    // console.log(todo);
-    // const newData = data.map((item) => {
-    //   if (item.id === idEdit) {
-    //     return {
-    //       ...item,
-    //       name: value,
-    //     };
-    //   }
-    //   return item;
-    // });
-    // setData(newData);
-    dispatch(editTodoItemAsync({ name: value, id: idEdit }));
-    setValue("");
+  const handleAddNote = async () => {
+    const date = new Date().toISOString();
+    dispatch(addNote({ ...value, time: date, id: uuidv4() }));
+    setValue({
+      title: "",
+      details: "",
+    });
   };
-  const handleChose = (todo) => {
-    setValue(todo.name);
-    setId(todo.id);
-    myInput.current.focus();
-  };
-  const handleDeleteTodo = async (id) => {
-    // const res = await fetch(
-    //   `https://6357f342c27556d28932afce.mockapi.io/api/v1/todos/${id}`,
-    //   {
-    //     method: "DELETE",
-    //   }
-    // );
-    // const deletedTodo = await res.json();
-    // const newData = data.filter((item) => item.id !== id);
-    // setData(newData);
-    dispatch(deleteTodoItemAsync(id));
+
+  const handleDeleteNote = (id) => {
+    dispatch(deleteNote(id));
   };
 
   return (
     <div className="App">
       <div className="header">
-        <h2>My To Do List</h2>
+        <h2>Timestamped Notes app</h2>
         <input
-          ref={myInput}
           type="text"
           id="myInput"
-          placeholder="Title..."
-          value={value}
-          onChange={handleChangeValue}
+          placeholder="Note Title"
+          value={value.title}
+          onChange={handleChangeTitle}
         />
-        <button className="addBtn" onClick={handleAddTodo}>
-          Add
-        </button>
-        <button className="addBtn" onClick={handleEditTodo}>
-          Edit
+
+        <input
+          type="text"
+          id="myInput"
+          placeholder="Note Details"
+          value={value.details}
+          onChange={handleChangeDetails}
+        />
+        <button className="addBtn" onClick={handleAddNote}>
+          Add Note
         </button>
       </div>
 
       <ul>
-        {data.map((item, index) => (
-          <Todo
-            key={index}
-            todo={item}
-            handleDeleteTodo={handleDeleteTodo}
-            handleChose={handleChose}
-          />
-        ))}
+        {data &&
+          data.map((item, index) => (
+            <Note key={index} note={item} handleDeleteNote={handleDeleteNote} />
+          ))}
       </ul>
     </div>
   );
